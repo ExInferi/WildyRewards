@@ -44,6 +44,18 @@ body {
     text-align: left;
 }
 
+.pumpkin {
+  color: rgb(255,102,0);
+}
+.total-radio {
+  justify-content: space-around;
+}
+label {
+  margin: 0;
+}
+h6 {
+  margin: 0.5rem;
+}
 .list-group {
     height: calc(100vh - 4.25em);
     overflow-y: scroll;
@@ -65,8 +77,4 @@ body {
     top: 10px;
     width: 100%;
     z-index: 1;
-}
-
-.total {
-    color: rgb(0, 255, 255);
 }

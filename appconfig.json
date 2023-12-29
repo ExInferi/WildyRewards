@@ -1,6 +1,6 @@
 {
-  "appName": "SerenTracker",
-  "description": "Tracks Seren Spirit Drops as they appear in the chat box.",
+  "appName": "PumpkinTracker",
+  "description": "Tracks Smashing Pumpkin Drops as they appear in the chat box. Based on the Seren Tracker by ZeroGwafa",
   "appUrl": "./index.html",
   "configUrl": "./appconfig.json",
   "iconUrl": "./readme-assets/icon.png",

@@ -55,6 +55,22 @@
                             </select>
                         </div>
                     </div>
+                   <div class="row">
+                        <div class="col" title="Enables the option to show the total pumpkins smashed.">
+                            <h6>Show totals</h6>
+                        </div>
+                  </div>
+                     <div class="row total-radio">
+                        <div class="row">
+                            <input type="radio" name="totals" id="show-totals" onclick="showItems()" checked/>
+                            <label for="show-totals">Enabled</label>
+                        </div>
+                        <div class="row">
+                          <input type="radio" name="totals" id="hide-totals" onclick="showItems()"/>
+                            <label for="hide-totals">Disabled</label>
+                        </div>
+                     </div> 
+                    
                     <div class="row">
                         <div class="col" title="Exports the current data as a CSV file.">
                             <button class='nisbutton export'>

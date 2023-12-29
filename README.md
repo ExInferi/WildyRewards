@@ -1,51 +1,36 @@
-# SerenTracker
+[Based on ZeroGwafa's Seren Tracker](https://github.com/ZeroGwafa/SerenTracker/tree/master)
 
-Tracks Seren Spirit drops gained via the chat window.
+For those of you who want to track what those pumpkins give you, I reworked the Seren Tracker to work for the Pumpkins.
 
-## Installation:
+![example](/readme-assets/ItemHistory.png)
 
-Install by copying this either copy pasting the following link in your browser.
+# How to install:
 
-alt1://addapp/https://zerogwafa.github.io/SerenTracker/appconfig.json
+* Go to the browser inside Alt1 toolkit
+* Visit `https://exinferi.nl/apps/PumpkinTracker`
+* Hit the yellow 'add app' button in the upper right corner.
+* **Make sure to turn chatfilter off and turn timestamps on!**
 
-Or, by going to the following link in the Alt1 Browser
+Have fun tracking!
 
-https://zerogwafa.github.io/SerenTracker/
+# Known issues:
 
-## Instructions:
+* With chat box text size set to 10pt, the party pumpkins aren't logged. This can be worked around by setting the size to 12pt.
 
-    1. Open app with RuneScape window visible.
+# Updates:
 
-    2. Ensure that the chat filter is off on the chat window you want to track materials on.
+**Update 16 Oct, 13:00 Game Time**:
 
-        2a. Ensure timestamps are on!
+Added support for the Party Pumpkins. Hovering over the item now also shows how you got it, and this is also added to the CSV export.
 
-    3. Make sure your transparency is turned off (Not see-through) on your interfaces!  Settings -> UI Customisation -> Move Transparency slider all the way to the left.
+**Update 16 Oct, 15:45 Game Time**:
 
-## Main Window
+Implemented a fix to correctly log the type of "Overhead Emotes" received. Requires reload of the app in order to take effect.
 
-![menu](/readme-assets/ItemHistory.png)
+**Update 21 Oct, 11:30 Game Time:**
 
-By default, the app will show the item history, or the list of items received from Seren Spirits, in the order of most recent at the top of the list. You can Mouse-Over each entry to see the local time and date when it was acquired.
+The app now shows the total pumpkins captured. You can disable this in the settings. For currently active users, this requires a reload of the app.
 
-Clicking the header (Where it shows "Seren Item History") will change the display to item totals.
+**Update 21 Oct, 15:30 Game Time:**
 
-![menu](/readme-assets/ItemTotals.png)
-
-This shows the total amount of each item acquired via Seren Spirits.
-
-## Settings
-
-![menu](/readme-assets/menu.png)
-
-### Select Chat
-
-This app will detect all visible chat windows. You can use this option to have the app target a specific window (The default is the window closest to the top-left of the screen). When selecting a different window, a box will surround the selected chat window briefly to show which chat you have selected.
-
-### CSV Export
-
-- Clicking this will generate a CSV file with your item history, or item totals (Whichever is currently displayed on the main screen).
-
-### Factory Reset
-
-- This can be used to fully reset everything on the app. Bringing back to a "fresh install" state.
+Added new display options. Clicking the header now cycles in this order: `Pumpkin Item History > Smashing Pumpkin Totals > Party Pumpkin Totals > Pumpkin Item Totals`The export function has been adjusted accordingly, so you can now separately export all total rewards from Smashing Pumpkins as well as Party Pumpkins. As with previous updates, this requires a reload for current active users.
