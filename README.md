@@ -2,7 +2,7 @@
 
 For those of you who want to track what those pumpkins give you, I reworked the Seren Tracker to work for the Pumpkins.
 
-![example](/readme-assets/ItemHistory.png)
+![example](/readme-assets/example.png)
 
 # How to install:
 
