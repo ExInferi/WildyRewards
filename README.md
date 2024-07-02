@@ -2,7 +2,7 @@
 
 For those of you who want to track what rewards the Beach gives you, I reworked the Seren Tracker to work for the skilling, clawdia and piñata loot bag drops.
 
-![example](/readme-assets/example.png)
+![example](/assets/example.png)
 
 # How to install
 
