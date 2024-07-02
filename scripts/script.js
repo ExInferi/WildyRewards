@@ -1,29 +1,43 @@
 //Enable "Add App" button for Alt1 Browser.
 A1lib.identifyApp("appconfig.json");
-
-const appColor = A1lib.mixColor(255, 102, 0);
+const url = window.location.origin + window.location.pathname;
+const COL = [255,255,0]; // Themed app color
+const appColor = A1lib.mixColor(COL[0], COL[1], COL[2]);
+const rgbColor = `rgb(${COL[0]}, ${COL[1]}, ${COL[2]})`;
 
 // Set Chat reader
 let reader = new Chatbox.default();
 reader.readargs = {
   colors: [
-    A1lib.mixColor(255, 102, 0), //Pumpkin text color
+    A1lib.mixColor(255, 255, 0), // Skilling Reward text color
+    A1lib.mixColor(255, 255, 255), // Pinata Reward text color
     // A1lib.mixColor(127,169,255), //Test Chat text color
   ],
   backwards: true,
 };
 
 //Setup localStorage variable.
-if (!localStorage.pumpkinData) {
-  localStorage.setItem("pumpkinData", JSON.stringify([]))
+if (!localStorage.beachData) {
+  localStorage.setItem("beachData", JSON.stringify([]))
 }
-if (!localStorage.pumpkinDisplay) {
-  localStorage.setItem("pumpkinDisplay", "history")
+if (!sessionStorage.beachChatHistory) {
+  sessionStorage.setItem("beachChatHistory", JSON.stringify([]))
 }
-let saveData = JSON.parse(localStorage.pumpkinData);
-
+if (!localStorage.beachDisplay) {
+  localStorage.setItem("beachDisplay", "history")
+}
+if (!localStorage.clawdiaKills) {
+  localStorage.setItem("clawdiaKills", 0)
+}
+let saveData = JSON.parse(localStorage.beachData);
+let saveChatHistory = JSON.parse(sessionStorage.beachChatHistory)
+let clawdiaKills = parseInt(JSON.parse(localStorage.clawdiaKills))
 //Find all visible chatboxes on screen
-$(".itemList").append("<li class='list-group-item'>Searching for chatboxes</li>");
+if (!window.alt1) {
+  $(".itemList").append(`<li class='list-group-item'>Alt1 not detected. <a href='alt1://addapp/${url}appconfig.json'>Click here to add the app to Alt1</a></li>`);
+} else {
+  $(".itemList").append("<li class='list-group-item'>Searching for chatboxes</li>");
+}
 window.addEventListener('load', function () {
   reader.find();
   reader.read();
@@ -38,8 +52,8 @@ let findChat = setInterval(function () {
       $(".chat").append(`<option value=${i}>Chat ${i}</option>`);
     });
 
-    if (localStorage.pumpkinChat) {
-      reader.pos.mainbox = reader.pos.boxes[localStorage.pumpkinChat];
+    if (localStorage.beachChat) {
+      reader.pos.mainbox = reader.pos.boxes[localStorage.beachChat];
     } else {
       //If multiple boxes are found, this will select the first, which should be the top-most chat box on the screen.
       reader.pos.mainbox = reader.pos.boxes[0];
@@ -65,92 +79,144 @@ function showSelectedChat(chat) {
       2000,
       5
     );
-  } catch {}
+  } catch { }
 }
-let lastPumpkinDetected;
+let lastRewardDetected;
 //Reading and parsing info from the chatbox.
 function readChatbox() {
-  var opts = reader.read() || [];
-  var chat = "";
+  let opts = reader.read() || [];
+  let chat = "";
 
-  for (a in opts) {
+  for (let a in opts) {
     chat += opts[a].text + " ";
   }
+  const foundBeach = chat.indexOf('While training on the beach') > -1;
+  const foundClawdia = chat.indexOf("You have received") > -1;
+  const foundPinata = chat.indexOf("You open the pinata loot bag") > -1;
 
-  if (chat.indexOf("Pumpkin gifts you") > -1) {
-    let currentPumpkinDetected = chat.match(/\[\d+:\d+:\d+\] The (Party|Smashing) Pumpkin gifts you : (\d+ x [A-Za-z\s-':()1-4]+)/);
-    if (currentPumpkinDetected[0].trim() === lastPumpkinDetected) {
+  if (foundBeach || foundClawdia || foundPinata) {
+    if (foundBeach) {
+      const regex = /(\[\d+:\d+:\d+\]) While training on the beach you find: ((\d+ x )?[A-Za-z\s'()\d]*)/
+      const item = chat.match(regex)[0];
+      saveItem(item, 'Skilling Reward', regex)
+    } else if (foundPinata) {
+      const regex = /(\[\d+:\d+:\d+\]) You receive: ((\d+ x )?[A-Za-z\s'()\d]*)/
+      const pinata = chat.match(/(\[\d+:\d+:\d+\]) You receive: ([A-Za-z\s'()\d]*)/g)
+      pinata.forEach((item) => {
+        saveItem(item, 'Pinata Loot', regex)
+      });
+    } else if (foundClawdia) {
+      clawdiaKills += 1;
+      localStorage.setItem('clawdiaKills', clawdiaKills);
+      const regex =/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*?)( x \d+)/
+      const clawdia = chat.match(/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*)/g)
+      clawdia.forEach((item) => {
+        saveItem(item, 'Clawdia Drop', regex)
+      })
+    } else {
+      console.warn("Unknown source");
       return;
     }
-    console.log(currentPumpkinDetected);
-
-    lastPumpkinDetected = currentPumpkinDetected[0].trim();
-
-    let getItem = {
-      //  item: chat.match(/\d+ x [A-Za-z\s-'()1-4]+/)[0].trim(),
-      item: currentPumpkinDetected[2].trim(),
-      source: `${currentPumpkinDetected[1].trim()} Pumpkin`,
-      time: new Date()
-    };
-    console.log(getItem);
-    saveData.push(getItem);
-    localStorage.setItem("pumpkinData", JSON.stringify(saveData));
-    checkAnnounce(getItem);
-    showItems();
   }
+}
+
+function saveItem(item, src, regex) {
+  if (saveChatHistory.indexOf(item) > -1) {
+    console.debug('Duplicate:', item);
+    return;
+  }
+  saveChatHistory.push(item);
+  sessionStorage.setItem("beachChatHistory", JSON.stringify(saveChatHistory));
+
+  const reward = item.match(regex);
+  console.log(reward[0])
+  const date = new Date();
+
+  const itemName = reward[2].replace(reward[3], '');
+  const itemAmount = !reward[3] ? 1 : reward[3].match(/\d+/);
+  const itemSource = src;
+  const itemTime = date.toISOString();
+
+  const getItem = {
+    item: `${itemAmount} x ${itemName}`,
+    source: itemSource,
+    time: itemTime
+  };
+  console.log(getItem);
+  saveData.push(getItem);
+  localStorage.setItem("beachData", JSON.stringify(saveData));
+  checkAnnounce(getItem);
+  showItems();
 }
 
 function showItems() {
   $(".itemList").empty();
-  let pumpkinsSmashing = 0;
-  let pumpkinsParty = 0;
+  let skillingRewards = 0;
+  let pinataRewards = 0;
+  let clawdiaRewards = 0;
   let showTotals = document.getElementById("show-totals");
+
 
   if (showTotals.checked) {
     saveData.forEach(item => {
-      if (item.source === "Smashing Pumpkin") {
-        pumpkinsSmashing++;
-      } else if (item.source === "Party Pumpkin") {
-        pumpkinsParty++;
+      switch (item.source) {
+        case 'Skilling Reward':
+          skillingRewards++;
+          break;
+        case 'Pinata Loot':
+          pinataRewards++;
+          break;
+        case 'Clawdia Drop':
+          clawdiaRewards++;
+          break;
       }
     });
 
   }
-  let pumpkinsTotal = pumpkinsParty + pumpkinsSmashing;
-  let display = localStorage.getItem("pumpkinDisplay");
+  let totalRewards = pinataRewards + skillingRewards + clawdiaRewards;
+  let display = localStorage.getItem("beachDisplay");
 
   if (display === "total") {
-    $(".itemList").append(`<li class="list-group-item header" data-show="history" title="Click to show Pumpkin History">Pumpkin Item Totals</li>`);
+    $(".itemList").append(`<li class="list-group-item header" data-show="history" title="Click to show Reward History">Reward Item Totals</li>`);
     let total = getTotal();
     if (showTotals.checked) {
-      $(".itemList").append(`<li class="list-group-item pumpkin">Total Pumpkins: <strong>${pumpkinsTotal}</strong></li>`);
+      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Rewards: <strong>${totalRewards}</strong></li>`);
     }
     Object.keys(total).sort().forEach(item => $(".itemList").append(`<li class="list-group-item">${item}: ${total[item]}</li>`))
   } else if (display === "history") {
-    $(".itemList").append(`<li class="list-group-item header" data-show="smashing" title="Click to show Smashing Pumpkin Totals">Pumpkin Item History</li>`);
+    $(".itemList").append(`<li class="list-group-item header" data-show="skilling" title="Click to show Skilling Reward Totals">Reward History</li>`);
     if (showTotals.checked) {
-      $(".itemList").append(`<li class="list-group-item pumpkin">Total Pumpkins: <strong>${pumpkinsTotal}</strong></li>`);
+      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Rewards: <strong>${totalRewards}</strong></li>`);
     }
     saveData.slice().reverse().map(item => {
       $(".itemList").append(`<li class="list-group-item" title="From: ${item.source} @ ${new Date(item.time).toLocaleString()}">${item.item}</li>`)
     })
-  } else if (display === "smashing") {
-    $(".itemList").append(`<li class="list-group-item header" data-show="party" title="Click to show Party Pumpkin Totals">Smashing Pumpkin Totals</li>`);
-    let totalSmashing = getTotalSmashing();
+  } else if (display === "skilling") {
+    $(".itemList").append(`<li class="list-group-item header" data-show="clawdia" title="Click to show Clawdia Drop Totals">Skilling Reward Totals</li>`);
+    let total = getTotalSkilling();
     if (showTotals.checked) {
-      $(".itemList").append(`<li class="list-group-item pumpkin">Total Smashing Pumpkins: <strong>${pumpkinsSmashing}</strong></li>`);
+      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Skilling Rewards: <strong>${skillingRewards}</strong></li>`);
     }
-    Object.keys(totalSmashing).sort().forEach(item => {
-      $(".itemList").append(`<li class="list-group-item">${item}: ${totalSmashing[item]}</li>`)
+    Object.keys(total).sort().forEach(item => {
+      $(".itemList").append(`<li class="list-group-item">${item}: ${total[item]}</li>`)
     })
-  } else if (display === "party") {
-    $(".itemList").append(`<li class="list-group-item header" data-show="total" title="Click to show all Pumpkin Totals">Party Pumpkin Totals</li>`);
-    let totalParty = getTotalParty();
+  } else if (display === "clawdia") {
+    $(".itemList").append(`<li class="list-group-item header" data-show="pinata" title="Click to show all Pinata Loot Totals">Clawdia Drop Totals</li>`);
+    let total = getTotalClawdia();
     if (showTotals.checked) {
-      $(".itemList").append(`<li class="list-group-item pumpkin">Total Party Pumpkins: <strong>${pumpkinsParty}</strong></li>`);
+      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Clawdia Drops: <strong>${clawdiaRewards}</strong> (${clawdiaKills} kc)</li>`);
     }
-    Object.keys(totalParty).sort().forEach(item => {
-      $(".itemList").append(`<li class="list-group-item">${item}: ${totalParty[item]}</li>`)
+    Object.keys(total).sort().forEach(item => {
+      $(".itemList").append(`<li class="list-group-item">${item}: ${total[item]}</li>`)
+    })
+  } else if (display === "pinata") {
+    $(".itemList").append(`<li class="list-group-item header" data-show="total" title="Click to show all Reward Totals">Pinata Loot Totals</li>`);
+    let total = getTotalPinata();
+    if (showTotals.checked) {
+      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Pinata Loots: <strong>${pinataRewards}</strong> (${pinataRewards / 2} bags)</li>`);
+    }
+    Object.keys(total).sort().forEach(item => {
+      $(".itemList").append(`<li class="list-group-item">${item}: ${total[item]}</li>`)
     })
   }
 }
@@ -159,14 +225,14 @@ function showItems() {
 
 
 function checkAnnounce(getItem) {
-  if (localStorage.pumpkinAnnounce) {
-    fetch(localStorage.getItem("pumpkinAnnounce"), {
+  if (localStorage.rewardAnnounce) {
+    fetch(localStorage.getItem("rewardAnnounce"), {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: "Pumpkin Tracker",
+        username: "Beach Tracker",
         content: `${new Date(getItem.time).toLocaleString()}: Received - ${getItem.item}`
       })
     })
@@ -183,10 +249,10 @@ function getTotal() {
   return total;
 }
 
-function getTotalSmashing() {
+function getTotalSkilling() {
   let total = {};
   saveData.forEach(item => {
-    if (item.source === "Smashing Pumpkin") {
+    if (item.source === "Skilling Reward") {
       data = item.item.split(" x ");
       total[data[1]] = parseInt(total[data[1]]) + parseInt(data[0]) || parseInt(data[0])
     }
@@ -194,10 +260,21 @@ function getTotalSmashing() {
   return total;
 }
 
-function getTotalParty() {
+function getTotalPinata() {
   let total = {};
   saveData.forEach(item => {
-    if (item.source === "Party Pumpkin") {
+    if (item.source === "Pinata Loot") {
+      data = item.item.split(" x ");
+      total[data[1]] = parseInt(total[data[1]]) + parseInt(data[0]) || parseInt(data[0])
+    }
+  })
+  return total;
+}
+
+function getTotalClawdia() {
+  let total = {};
+  saveData.forEach(item => {
+    if (item.source === "Clawdia Drop") {
       data = item.item.split(" x ");
       total[data[1]] = parseInt(total[data[1]]) + parseInt(data[0]) || parseInt(data[0])
     }
@@ -210,7 +287,7 @@ $(function () {
   $(".chat").change(function () {
     reader.pos.mainbox = reader.pos.boxes[$(this).val()];
     showSelectedChat(reader.pos);
-    localStorage.setItem("pumpkinChat", $(this).val());
+    localStorage.setItem("beachChat", $(this).val());
     $(this).val("");
   });
 
@@ -220,52 +297,63 @@ $(function () {
     var downTime = exportDate.getHours().toString() + "-" + (exportDate.getMinutes() + 1).toString() + "-" + exportDate.getSeconds().toString();
     var str, fileName;
 
-    //count all pumpkins
-    let pumpkinsSmashing = 0;
-    let pumpkinsParty = 0;
+    //count all rewards
+    let skillingRewards = 0;
+    let pinataRewards = 0;
+    let clawdiaRewards = 0;
     saveData.forEach(item => {
-      if (item.source === "Smashing Pumpkin") {
-        pumpkinsSmashing++;
-      } else if (item.source === "Party Pumpkin") {
-        pumpkinsParty++;
+      switch (item.source) {
+        case 'Skilling Reward':
+          skillingRewards++;
+          break;
+        case 'Pinata Loot':
+          pinataRewards++;
+          break;
+        case 'Clawdia Drop':
+          clawdiaRewards++;
+          break;
       }
     });
-    let pumpkinsTotal = pumpkinsParty + pumpkinsSmashing;
+    let totalRewards = pinataRewards + skillingRewards + clawdiaRewards;
 
     //If totals is checked, export totals
-    if (localStorage.getItem("pumpkinDisplay") === "total") {
-      str = `Item,Qty\nTotal smashing pumpkins,${pumpkinsSmashing}\nTotal party pumpkins,${pumpkinsParty}\nTotal combined pumpkins,${pumpkinsTotal}\n`;
+    if (localStorage.getItem("beachDisplay") === "total") {
+      str = `Item,Qty\nTotal Skilling Rewards,${skillingRewards}\nTotal Pinata Loots,${pinataRewards}\nTotal combined rewards,${totalRewards}\n`;
       let total = getTotal();
       Object.keys(total).sort().forEach(item => str = `${str}${item},${total[item]}\n`);
-      fileName = `pumpkinTotalExport_${downDate}_${downTime}.csv`;
+      fileName = `beachTotalExport_${downDate}_${downTime}.csv`;
 
       // export list by item and time received.
-    } else if (localStorage.getItem("pumpkinDisplay") === "history") {
-      str = `Item,Source,Date,Time\n${pumpkinsSmashing} x Total Smashed,Smashing Pumpkin,${exportDate.toLocaleDateString()},${exportDate.toLocaleTimeString()}\n${pumpkinsParty} x Total Smashed,Party Pumpkin,${exportDate.toLocaleDateString()},${exportDate.toLocaleTimeString()}\n${pumpkinsTotal} x Total Smashed,All Pumpkins,${exportDate.toLocaleDateString()},${exportDate.toLocaleTimeString()}\n`;
-      // making sure all items have a source, as the first version didn't save the source seperately 
+    } else if (localStorage.getItem("beachDisplay") === "history") {
+      str = `Item,Source,Date,Time\n${skillingRewards} x Total Obtained,Skilling Reward,${exportDate.toLocaleDateString()},${exportDate.toLocaleTimeString()}\n${pinataRewards} x Total Obtained,Pinata Loot,${exportDate.toLocaleDateString()},${exportDate.toLocaleTimeString()}\n${totalRewards} x Total Obtained,All Rewards,${exportDate.toLocaleDateString()},${exportDate.toLocaleTimeString()}\n`;
       saveData.forEach((item) => {
-        if (item.source == undefined) {
-          item.source = "Smashing Pumpkin";
-        }
         str = `${str}${item.item},${item.source},${new Date(item.time).toLocaleString()}\n`;
       });
-      fileName = `pumpkinHistoryExport_${downDate}_${downTime}.csv`;
+      fileName = `rewardHistoryExport_${downDate}_${downTime}.csv`;
 
-      //export total smashing pumpkins
-    } else if (localStorage.getItem("pumpkinDisplay") === "smashing") {
+      //export total Skilling Rewards
+    } else if (localStorage.getItem("beachDisplay") === "skilling") {
       str = "Item,Qty\n";
-      let totalSmashing = getTotalSmashing();
-      Object.keys(totalSmashing).sort().forEach(item => str = `${str}${item},${totalSmashing[item]}\n`);
-      str += `Total pumpkins,${pumpkinsSmashing}`;
-      fileName = `pumpkinSmashingTotalExport_${downDate}_${downTime}.csv`;
+      let totalSkilling = getTotalSkilling();
+      Object.keys(totalSkilling).sort().forEach(item => str = `${str}${item},${totalSkilling[item]}\n`);
+      str += `Total rewards,${skillingRewards}`;
+      fileName = `skillingRewardTotalExport_${downDate}_${downTime}.csv`;
 
-      //export total party pumpkins 
-    } else if (localStorage.getItem("pumpkinDisplay") === "party") {
+      //export total Clawdia Drops
+    } else if (localStorage.getItem("beachDisplay") === "clawdia") {
       str = "Item,Qty\n";
-      let totalParty = getTotalParty();
-      Object.keys(totalParty).sort().forEach(item => str = `${str}${item},${totalParty[item]}\n`);
-      str += `Total pumpkins,${pumpkinsParty}`;
-      fileName = `pumpkinPartyTotalExport_${downDate}_${downTime}.csv`;
+      let totalClawdia = getTotalClawdia();
+      Object.keys(totalClawdia).sort().forEach(item => str = `${str}${item},${totalClawdia[item]}\n`);
+      str += `Total rewards,${clawdiaRewards}`;
+      fileName = `clawdiaRewardTotalExport_${downDate}_${downTime}.csv`;
+
+      //export total Pinata Loots 
+    } else if (localStorage.getItem("beachDisplay") === "pinata") {
+      str = "Item,Qty\n";
+      let totalPinata = getTotalPinata();
+      Object.keys(totalPinata).sort().forEach(item => str = `${str}${item},${totalPinata[item]}\n`);
+      str += `Total rewards,${pinataRewards}`;
+      fileName = `pinataRewardTotalExport_${downDate}_${downTime}.csv`;
     }
 
     var blob = new Blob([str], {
@@ -291,32 +379,32 @@ $(function () {
   });
 
   $(".clear").click(function () {
-    localStorage.removeItem("pumpkinData");
-    localStorage.removeItem("pumpkinChat");
-    localStorage.removeItem("pumpkinDisplay")
-    localStorage.removeItem("totals_hide-totals")
-    localStorage.removeItem("totals_show-totals");
+    localStorage.removeItem("beachData");
+    localStorage.removeItem("beachChat");
+    localStorage.removeItem("beachDisplay")
+    localStorage.removeItem("beachTotals_hide-totals")
+    localStorage.removeItem("beachTotals_show-totals");
     $("#show-totals").prop("checked", true);
 
     location.reload();
   })
 
   $(document).on("click", ".header", function () {
-    localStorage.setItem("pumpkinDisplay", $(this).data("show"));
+    localStorage.setItem("beachDisplay", $(this).data("show"));
     showItems()
   })
 });
 
 $(function () {
   $('input[type=radio]').each(function () {
-    var state = JSON.parse(localStorage.getItem('totals_' + this.id));
+    var state = JSON.parse(localStorage.getItem('beachTotals_' + this.id));
     if (state) this.checked = state.checked;
   });
 });
 
 $(window).bind('unload', function () {
   $('input[type=radio]').each(function () {
-    localStorage.setItem('totals_' + this.id, JSON.stringify({
+    localStorage.setItem('beachTotals_' + this.id, JSON.stringify({
       checked: this.checked
     }));
   });
@@ -326,14 +414,15 @@ $(window).bind('unload', function () {
 
 // Event listener to check if data has been altered
 window.addEventListener('storage', function (e) {
-  if (e.key === "pumpkinData") {
+  if (e.key === "beachData" || e.key === "clawdiaKills") {
 
-    let changedData = JSON.parse(localStorage.pumpkinData);
+    let changedData = JSON.parse(localStorage.beachData);
     let lastChange = changedData[changedData.length - 1];
     let lastSave = [saveData[saveData.length - 1]]
-    
+
     if (lastChange != lastSave) {
       saveData = changedData;
-      showItems();}
+      showItems();
     }
+  }
 });

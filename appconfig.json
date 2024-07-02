@@ -1,9 +1,9 @@
 {
-  "appName": "PumpkinTracker",
-  "description": "Tracks Smashing Pumpkin Drops as they appear in the chat box. Based on the Seren Tracker by ZeroGwafa",
+  "appName": "BeachTracker",
+  "description": "Tracks drops obtained on The Beach as they appear in the chat box. Based on the Seren Tracker by ZeroGwafa",
   "appUrl": "./index.html",
   "configUrl": "./appconfig.json",
-  "iconUrl": "./readme-assets/icon.png",
+  "iconUrl": "./assets/icon.png",
   "defaultWidth": 218,
   "defaultHeight": 139,
   "minWidth": 218,
