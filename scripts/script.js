@@ -63,7 +63,7 @@ let findChat = setInterval(function () {
     showItems();
     setInterval(function () {
       readChatbox();
-    }, 10);
+    }, 100);
   }
 }, 1000);
 
@@ -103,7 +103,6 @@ function readChatbox() {
       const regex = /(\[\d+:\d+:\d+\]) You receive: ((\d+ x )?[A-Za-z\s'()\d]*)/
       const pinata = chat.match(/(\[\d+:\d+:\d+\]) You receive: ([A-Za-z\s'()\d]*)/g)
       const filteredPinata = filterItems(pinata, regex);
-      console.log(filteredPinata)
       filteredPinata.forEach((item) => {
         saveItem(item, 'Pinata Loot', regex)
       });
@@ -113,7 +112,6 @@ function readChatbox() {
       const regex =/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*?)( x \d+)/
       const clawdia = chat.match(/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*)/g)
       const filteredClawdia = filterItems(clawdia, regex);
-      console.log(filteredClawdia)
       filteredClawdia.forEach((item) => {
         saveItem(item, 'Clawdia Drop', regex)
       })
@@ -126,10 +124,8 @@ function readChatbox() {
 
 // Add together all items of the same type
 function filterItems(items, regex) {
-  console.debug('Filtering items:', items);
   const filteredItemsMap = items.reduce((acc, itemString) => {
     const match = itemString.match(regex);
-    console.debug('Match:', match);
     if (match) {
       const itemName = match[2].trim();
       const quantityMatch = match[3] ? match[3].match(/\d+/) : ['1'];
@@ -141,20 +137,16 @@ function filterItems(items, regex) {
         acc[itemName] = quantity;
       }
     }
-    console.debug('Acc:', acc);
     return acc;
   }, {});
 
   // Then, create a new array with updated quantities for each item
   const updatedItemsArray = items.map(itemString => {
     const match = itemString.match(regex);
-    console.debug('New match:', match);
     if (match) {
       const itemName = match[2].trim();
-      console.debug('Item name:', itemName);
       const totalQuantity = filteredItemsMap[itemName];
       // Replace the quantity in the original string
-      console.debug('Total quantity:', totalQuantity);
       return itemString.replace(/(?: x (\d+))|(?:(\d+) x )/, (match, group1, group2) => {
         const digit = group1 || group2;
         return match.replace(digit, totalQuantity);
@@ -162,13 +154,12 @@ function filterItems(items, regex) {
     }
     return itemString;
   });
-  for (let i = 0; i < items.length; i++) {
-    console.debug('Checking:', updatedItemsArray[i], items[i]);
-    if (updatedItemsArray[i] !== items[i]) {
-      console.debug('Pushing:', items[i]);
-      saveChatHistory.push(items[i]);
+  // Update the saveChatHistory with the original item that was modified
+  items.forEach(item => {
+    if (!updatedItemsArray.includes(item) && !saveChatHistory.includes(item)) {
+      saveChatHistory.push(item);
     }
-  }
+  });
   return updatedItemsArray;
 }
 
