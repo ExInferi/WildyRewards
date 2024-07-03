@@ -20,15 +20,21 @@ reader.readargs = {
 if (!localStorage.beachData) {
   localStorage.setItem("beachData", JSON.stringify([]))
 }
+let saveData = JSON.parse(localStorage.beachData);
+
 if (!sessionStorage.beachChatHistory) {
   sessionStorage.setItem("beachChatHistory", JSON.stringify([]))
 }
+let saveChatHistory = JSON.parse(sessionStorage.beachChatHistory)
+
 if (!localStorage.beachDisplay) {
   localStorage.setItem("beachDisplay", "history")
 }
 if (!localStorage.clawdiaKills) {
   localStorage.setItem("clawdiaKills", 0)
 }
+let clawdiaKills = parseInt(JlocalStorage.clawdiaKills)
+
 if (!localStorage.pinatasOpened) {
   let pinataRewards = 0;
   saveData.forEach(item => {
@@ -38,9 +44,6 @@ if (!localStorage.pinatasOpened) {
   });
   localStorage.setItem("pinatasOpened", pinataRewards / 2 | 0)
 }
-let saveData = JSON.parse(localStorage.beachData);
-let saveChatHistory = JSON.parse(sessionStorage.beachChatHistory)
-let clawdiaKills = parseInt(JlocalStorage.clawdiaKills)
 let pinatasOpened = parseInt(localStorage.pinatasOpened)
 
 //Find all visible chatboxes on screen
