@@ -1,7 +1,7 @@
 //Enable "Add App" button for Alt1 Browser.
 A1lib.identifyApp("appconfig.json");
 const url = window.location.href.replace('index.html', '');
-const COL = [255,255,0]; // Themed app color
+const COL = [255, 255, 0]; // Themed app color
 const appColor = A1lib.mixColor(COL[0], COL[1], COL[2]);
 const rgbColor = `rgb(${COL[0]}, ${COL[1]}, ${COL[2]})`;
 
@@ -29,9 +29,20 @@ if (!localStorage.beachDisplay) {
 if (!localStorage.clawdiaKills) {
   localStorage.setItem("clawdiaKills", 0)
 }
+if (!localStorage.pinatasOpened) {
+  let pinataRewards = 0;
+  saveData.forEach(item => {
+    if (item.source === 'Pinata Loot') {
+      pinataRewards++;
+    }
+  });
+  localStorage.setItem("pinatasOpened", pinataRewards / 2 | 0)
+}
 let saveData = JSON.parse(localStorage.beachData);
 let saveChatHistory = JSON.parse(sessionStorage.beachChatHistory)
-let clawdiaKills = parseInt(JSON.parse(localStorage.clawdiaKills))
+let clawdiaKills = parseInt(JlocalStorage.clawdiaKills)
+let pinatasOpened = parseInt(localStorage.pinatasOpened)
+
 //Find all visible chatboxes on screen
 if (!window.alt1) {
   $(".itemList").append(`<li class='list-group-item'>Alt1 not detected. <a href='alt1://addapp/${url}appconfig.json'>Click here to add the app to Alt1</a></li>`);
@@ -63,7 +74,7 @@ let findChat = setInterval(function () {
     showItems();
     setInterval(function () {
       readChatbox();
-    }, 100);
+    }, 300);
   }
 }, 1000);
 
@@ -100,19 +111,41 @@ function readChatbox() {
       const item = chat.match(regex)[0];
       saveItem(item, 'Skilling Reward', regex)
     } else if (foundPinata) {
+      let captured = false
+
       const regex = /(\[\d+:\d+:\d+\]) You receive: ((\d+ x )?[A-Za-z\s'()\d]*)/
       const pinata = chat.match(/(\[\d+:\d+:\d+\]) You receive: ([A-Za-z\s'()\d]*)/g)
-      const filteredPinata = filterItems(pinata, regex);
-      filteredPinata.forEach((item) => {
+      const filtered = filterItems(pinata, regex);
+      // Check if the captured item is already saved
+      filtered.forEach((item) => {
+        if (saveChatHistory.includes(item)) {
+          captured = true;
+        }
+      });
+      if (captured) {
+        return;
+      }
+      filtered.forEach((item) => {
         saveItem(item, 'Pinata Loot', regex)
       });
     } else if (foundClawdia) {
+      let captured = false
+
+      const regex = /(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*?)( x \d+)/
+      const clawdia = chat.match(/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*)/g)
+      const filtered = filterItems(clawdia, regex);
+      // Check if the captured item is already saved
+      filtered.forEach((item) => {
+        if (saveChatHistory.includes(item)) {
+          captured = true;
+        }
+      });
+      if (captured) {
+        return;
+      }
       clawdiaKills += 1;
       localStorage.setItem('clawdiaKills', clawdiaKills);
-      const regex =/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*?)( x \d+)/
-      const clawdia = chat.match(/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*)/g)
-      const filteredClawdia = filterItems(clawdia, regex);
-      filteredClawdia.forEach((item) => {
+      filtered.forEach((item) => {
         saveItem(item, 'Clawdia Drop', regex)
       })
     } else {
@@ -256,7 +289,7 @@ function showItems() {
     $(".itemList").append(`<li class="list-group-item header" data-show="total" title="Click to show all Reward Totals">Pinata Loot Totals</li>`);
     let total = getTotalPinata();
     if (showTotals.checked) {
-      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Pinata Loots: <strong>${pinataRewards}</strong> (${pinataRewards / 2} bags)</li>`);
+      $(".itemList").append(`<li class="list-group-item" style="color:${rgbColor}">Total Pinata Loots: <strong>${pinataRewards}</strong> (${pinatasOpened} bags)</li>`);
     }
     Object.keys(total).sort().forEach(item => {
       $(".itemList").append(`<li class="list-group-item">${item}: ${total[item]}</li>`)
@@ -387,7 +420,7 @@ $(function () {
       str = "Item,Qty\n";
       let totalClawdia = getTotalClawdia();
       Object.keys(totalClawdia).sort().forEach(item => str = `${str}${item},${totalClawdia[item]}\n`);
-      str += `Total rewards,${clawdiaRewards}`;
+      str += `Total rewards,${clawdiaRewards}\nTotal kills,${clawdiaKills}`;
       fileName = `clawdiaRewardTotalExport_${downDate}_${downTime}.csv`;
 
       //export total Pinata Loots 
@@ -395,7 +428,7 @@ $(function () {
       str = "Item,Qty\n";
       let totalPinata = getTotalPinata();
       Object.keys(totalPinata).sort().forEach(item => str = `${str}${item},${totalPinata[item]}\n`);
-      str += `Total rewards,${pinataRewards}`;
+      str += `Total rewards,${pinataRewards}\nTotal bags opened,${pinatasOpened}`;
       fileName = `pinataRewardTotalExport_${downDate}_${downTime}.csv`;
     }
 
@@ -457,7 +490,7 @@ $(window).bind('unload', function () {
 
 // Event listener to check if data has been altered
 window.addEventListener('storage', function (e) {
-  if (e.key === "beachData" || e.key === "clawdiaKills") {
+  if (e.key === "beachData" || e.key === "clawdiaKills" || e.key === "pinatasOpened") {
 
     let changedData = JSON.parse(localStorage.beachData);
     let lastChange = changedData[changedData.length - 1];
