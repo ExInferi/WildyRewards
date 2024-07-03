@@ -493,17 +493,39 @@ $(window).bind('unload', function () {
 
 // Event listener to check if data has been altered
 window.addEventListener('storage', function (e) {
-  if (e.key === "beachData" || e.key === "clawdiaKills" || e.key === "pinatasOpened") {
+  let dataChanged = false;
 
-    let changedData = JSON.parse(localStorage.beachData);
-    let lastChange = changedData[changedData.length - 1];
-    let lastSave = [saveData[saveData.length - 1]]
-
-    if (lastChange != lastSave) {
-      saveData = changedData;
-      showItems();
+  switch (e.key) {
+    case "beachData": {
+      let changedData = JSON.parse(localStorage.beachData);
+      let lastChange = changedData[changedData.length - 1];
+      let lastSave = [saveData[saveData.length - 1]]
+      if (lastChange != lastSave) {
+        saveData = changedData;
+        dataChanged = true;
+      }
     }
+      break;
+    case "clawdiaKills": {
+      if (clawdiaKills != parseInt(localStorage.clawdiaKills)) {
+        clawdiaKills = parseInt(localStorage.clawdiaKills);
+        dataChanged = true;
+      }
+    }
+      break;
+    case "pinatasOpened": {
+      if (pinatasOpened != parseInt(localStorage.pinatasOpened)) {
+        pinatasOpened = parseInt(localStorage.pinatasOpened);
+        dataChanged = true;
+      }
+    }
+      break;
   }
+
+  if (dataChanged) {
+    showItems();
+  }
+
 });
 
 // Force read chatbox
