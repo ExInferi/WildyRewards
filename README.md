@@ -20,6 +20,10 @@ Have fun tracking!
 
 # Updates
 
+**Update 03 July 2024, 08:40 Game Time**:
+
+Added new checks for counting loot bags and Clawdia kills
+
 **Update 03 July 2024, 07:40 Game Time**:
 
 Added fix for duplicate drops
