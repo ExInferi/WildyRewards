@@ -128,6 +128,8 @@ function readChatbox() {
       if (captured) {
         return;
       }
+      pinatasOpened += 1;
+      localStorage.setItem('pinatasOpened', pinatasOpened);
       filtered.forEach((item) => {
         saveItem(item, 'Pinata Loot', regex)
       });
