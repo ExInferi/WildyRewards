@@ -20,6 +20,10 @@ Have fun tracking!
 
 # Updates
 
+**Update 03 July 2024, 07:40 Game Time**:
+
+Added fix for duplicate drops
+
 **Update 02 July 2024, 14:00 Game Time**:
 
 Release! 

@@ -1,6 +1,6 @@
 //Enable "Add App" button for Alt1 Browser.
 A1lib.identifyApp("appconfig.json");
-const url = window.location.origin + window.location.pathname;
+const url = window.location.href.replace('index.html', '');
 const COL = [255,255,0]; // Themed app color
 const appColor = A1lib.mixColor(COL[0], COL[1], COL[2]);
 const rgbColor = `rgb(${COL[0]}, ${COL[1]}, ${COL[2]})`;
@@ -63,7 +63,7 @@ let findChat = setInterval(function () {
     showItems();
     setInterval(function () {
       readChatbox();
-    }, 10);
+    }, 100);
   }
 }, 1000);
 
@@ -102,7 +102,8 @@ function readChatbox() {
     } else if (foundPinata) {
       const regex = /(\[\d+:\d+:\d+\]) You receive: ((\d+ x )?[A-Za-z\s'()\d]*)/
       const pinata = chat.match(/(\[\d+:\d+:\d+\]) You receive: ([A-Za-z\s'()\d]*)/g)
-      pinata.forEach((item) => {
+      const filteredPinata = filterItems(pinata, regex);
+      filteredPinata.forEach((item) => {
         saveItem(item, 'Pinata Loot', regex)
       });
     } else if (foundClawdia) {
@@ -110,7 +111,8 @@ function readChatbox() {
       localStorage.setItem('clawdiaKills', clawdiaKills);
       const regex =/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*?)( x \d+)/
       const clawdia = chat.match(/(\[\d+:\d+:\d+\]) You have received: ([A-Za-z\s'\-!()\d]*)/g)
-      clawdia.forEach((item) => {
+      const filteredClawdia = filterItems(clawdia, regex);
+      filteredClawdia.forEach((item) => {
         saveItem(item, 'Clawdia Drop', regex)
       })
     } else {
@@ -118,6 +120,47 @@ function readChatbox() {
       return;
     }
   }
+}
+
+// Add together all items of the same type
+function filterItems(items, regex) {
+  const filteredItemsMap = items.reduce((acc, itemString) => {
+    const match = itemString.match(regex);
+    if (match) {
+      const itemName = match[2].trim();
+      const quantityMatch = match[3] ? match[3].match(/\d+/) : ['1'];
+      const quantity = parseInt(quantityMatch[0], 10);
+
+      if (acc[itemName]) {
+        acc[itemName] += quantity;
+      } else {
+        acc[itemName] = quantity;
+      }
+    }
+    return acc;
+  }, {});
+
+  // Then, create a new array with updated quantities for each item
+  const updatedItemsArray = items.map(itemString => {
+    const match = itemString.match(regex);
+    if (match) {
+      const itemName = match[2].trim();
+      const totalQuantity = filteredItemsMap[itemName];
+      // Replace the quantity in the original string
+      return itemString.replace(/(?: x (\d+))|(?:(\d+) x )/, (match, group1, group2) => {
+        const digit = group1 || group2;
+        return match.replace(digit, totalQuantity);
+      });
+    }
+    return itemString;
+  });
+  // Update the saveChatHistory with the original item that was modified
+  items.forEach(item => {
+    if (!updatedItemsArray.includes(item) && !saveChatHistory.includes(item)) {
+      saveChatHistory.push(item);
+    }
+  });
+  return updatedItemsArray;
 }
 
 function saveItem(item, src, regex) {
