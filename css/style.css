@@ -77,4 +77,10 @@ h6 {
     top: 10px;
     width: 100%;
     z-index: 1;
+    cursor: default;
+    user-select: none;
+}
+
+.header:hover {
+    background-position: 0px -300%;
 }
