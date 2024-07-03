@@ -126,8 +126,10 @@ function readChatbox() {
 
 // Add together all items of the same type
 function filterItems(items, regex) {
+  console.debug('Filtering items:', items);
   const filteredItemsMap = items.reduce((acc, itemString) => {
     const match = itemString.match(regex);
+    console.debug('Match:', match);
     if (match) {
       const itemName = match[2].trim();
       const quantityMatch = match[3] ? match[3].match(/\d+/) : ['1'];
@@ -139,16 +141,20 @@ function filterItems(items, regex) {
         acc[itemName] = quantity;
       }
     }
+    console.debug('Acc:', acc);
     return acc;
   }, {});
 
   // Then, create a new array with updated quantities for each item
   const updatedItemsArray = items.map(itemString => {
     const match = itemString.match(regex);
+    console.debug('New match:', match);
     if (match) {
       const itemName = match[2].trim();
+      console.debug('Item name:', itemName);
       const totalQuantity = filteredItemsMap[itemName];
       // Replace the quantity in the original string
+      console.debug('Total quantity:', totalQuantity);
       return itemString.replace(/\d+$/, totalQuantity.toString());
     }
     return itemString;
