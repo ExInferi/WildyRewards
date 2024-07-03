@@ -478,3 +478,6 @@ window.addEventListener('storage', function (e) {
     }
   }
 });
+
+// Force read chatbox
+A1lib.on('alt1pressed', readChatbox);
