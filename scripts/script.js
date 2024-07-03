@@ -155,7 +155,11 @@ function filterItems(items, regex) {
       const totalQuantity = filteredItemsMap[itemName];
       // Replace the quantity in the original string
       console.debug('Total quantity:', totalQuantity);
-      return itemString.replace(/\d+$/, totalQuantity.toString());
+      console.debug('Old replace:', itemString.replace(/(?: x (\d+))|(?:(\d+) x )/, totalQuantity.toString()))
+      return itemString.replace(/(?: x (\d+))|(?:(\d+) x )/, (match, group1, group2) => {
+        const digit = group1 || group2;
+        return match.replace(digit, totalQuantity);
+      });
     }
     return itemString;
   });
