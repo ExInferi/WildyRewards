@@ -155,7 +155,6 @@ function filterItems(items, regex) {
       const totalQuantity = filteredItemsMap[itemName];
       // Replace the quantity in the original string
       console.debug('Total quantity:', totalQuantity);
-      console.debug('Old replace:', itemString.replace(/(?: x (\d+))|(?:(\d+) x )/, totalQuantity.toString()))
       return itemString.replace(/(?: x (\d+))|(?:(\d+) x )/, (match, group1, group2) => {
         const digit = group1 || group2;
         return match.replace(digit, totalQuantity);
@@ -163,7 +162,13 @@ function filterItems(items, regex) {
     }
     return itemString;
   });
-
+  for (let i = 0; i < items.length; i++) {
+    console.debug('Checking:', updatedItemsArray[i], items[i]);
+    if (updatedItemsArray[i] !== items[i]) {
+      console.debug('Pushing:', items[i]);
+      saveChatHistory.push(items[i]);
+    }
+  }
   return updatedItemsArray;
 }
 
