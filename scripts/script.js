@@ -33,7 +33,7 @@ if (!localStorage.beachDisplay) {
 if (!localStorage.clawdiaKills) {
   localStorage.setItem("clawdiaKills", 0)
 }
-let clawdiaKills = parseInt(JlocalStorage.clawdiaKills)
+let clawdiaKills = parseInt(localStorage.clawdiaKills)
 
 if (!localStorage.pinatasOpened) {
   let pinataRewards = 0;
