@@ -1,6 +1,6 @@
 {
-  "appName": "BeachTracker",
-  "description": "Tracks drops obtained on The Beach as they appear in the chat box. Based on the Seren Tracker by ZeroGwafa",
+  "appName": "WildyRewards",
+  "description": "Tracks rewards from Wilderness Flash Events. Based on the Seren Tracker by ZeroGwafa",
   "appUrl": "./index.html",
   "configUrl": "./appconfig.json",
   "iconUrl": "./assets/icon.png",

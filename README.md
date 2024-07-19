@@ -1,17 +1,17 @@
-# BeachTracker
+# WildyRewards
 
 [Based on ZeroGwafa's Seren Tracker](https://github.com/ZeroGwafa/SerenTracker/tree/master)
 
-For those of you who want to track what rewards the Beach gives you, I reworked the Seren Tracker to work for the skilling, clawdia and piñata loot bag drops.
+For those of you who want to track the loot from Wilderness Flash Events, I reworked the Seren Tracker to work for the Sack of (very) wild rewards and Wyrm reward gland.
 
 ![example](/assets/example.png)
 
 ## How to install
 
-Go to [the app](https://exinferi.nl/apps/beach) in your browser and click the link, or:
+Go to [the app](https://exinferi.nl/apps/wildy) in your browser and click the link, or:
 
 1. Go to the browser inside Alt1 toolkit
-2. Visit `https://exinferi.nl/apps/beach`
+2. Visit `https://exinferi.nl/apps/wildy`
 3. Hit the yellow 'add app' button in the upper right corner.
 
 **Make sure to turn chatfilter off and turn timestamps on!**
@@ -25,18 +25,7 @@ Have fun tracking!
 
 ## Updates
 
-**Update 03 July 2024, 08:40 Game Time**:
-
-* Added new checks for counting loot bags and Clawdia kills
-* Improved support for multiple clients
-
-**Update 03 July 2024, 07:40 Game Time**:
-
-* Added fix for duplicate drops
-
-**Update 02 July 2024, 14:00 Game Time**:
-
-* Release!
+Soon™
 
 ## Special thanks
 
