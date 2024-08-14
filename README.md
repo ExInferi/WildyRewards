@@ -20,7 +20,6 @@ Have fun tracking!
 
 ## Known issues  
 
-* It does not track oddments, as they don't use the regular reward text and can't currently be tracked in a reliable manner.
 * May behave odd with size 10 chat.
 
 ## Updates
