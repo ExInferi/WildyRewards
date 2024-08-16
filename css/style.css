@@ -7,7 +7,7 @@ body {
 }
 
 .nisbutton {
-    font-size: 8pt !important;
+    border: none;
 }
 
 .main {
@@ -16,10 +16,16 @@ body {
     margin-top: 8px;
 }
 
+
+.modal-dialog {
+    margin: 0;
+}
+
 .modal-body,
 .modal-header,
-.modal-footer {
-    background-color: grey;
+.modal-footer,
+.modal-content {
+    background-color: #0002 !important;
     color: white;
 }
 
@@ -35,13 +41,14 @@ body {
     font-weight: bold;
 }
 
-.list-group-item {
+.list-group li {
     background: transparent;
     border: grey solid 1px;
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: .25rem;
     text-align: left;
+    margin-bottom: -1px;
 }
 
 .total-radio {
@@ -66,7 +73,7 @@ h6 {
     display: none;
 }
 
-.header {
+.list-group li:first-child {
     text-align: center;
     background: url(https://runeapps.org/nis/alt1-currentskin/nisbutton.png) 0px -100%/24px 400% repeat content-box;
     background-color: black;

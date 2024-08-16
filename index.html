@@ -13,10 +13,9 @@
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="https://runeapps.org/nis/nis.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-
-    <script type="text/javascript" src="https://runeapps.org/runeappslib.js"></script>
     <link rel="stylesheet" type="text/css" href="https://runeapps.org/runeappslib.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <!-- <script type="text/javascript" src="https://runeapps.org/runeappslib.js"></script> -->
     <script src="https://www.unpkg.com/@alt1/base/dist/index.bundle.js"></script>
     <script src="https://www.unpkg.com/@alt1/ocr/dist/index.bundle.js"></script>
     <script src="https://www.unpkg.com/@alt1/chatbox/dist/index.bundle.js"></script>
@@ -24,7 +23,7 @@
 
 <body class="nis">
 
-    <ul class="itemList list-group"></ul>
+    <ul class="list-group" id="item-list"></ul>
 
     <div class="container">
         <div class="row fixed-bottom">
@@ -34,7 +33,8 @@
                         <!-- <button class="tracker nisbutton">
                             Start
                         </button> -->
-                        <button class="nisbutton" data-toggle="modal" data-target="#settings" type="button">
+                        <button class="nisbutton nissmallbutton" data-toggle="modal" data-target="#settings"
+                            type="button">
                             Settings
                         </button>
                     </div>
@@ -69,25 +69,26 @@
                     </div>
                     <div class="row total-radio">
                         <div class="row">
-                            <input type="radio" name="totals" id="show-totals" onclick="showItems()" checked>
+                            <input type="radio" name="totals" id="show-totals" data-totals="show" checked>
                             <label for="show-totals">Enabled</label>
                         </div>
                         <div class="row">
-                            <input type="radio" name="totals" id="hide-totals" onclick="showItems()">
+                            <input type="radio" name="totals" id="hide-totals" data-totals="hide">
                             <label for="hide-totals">Disabled</label>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col" title="Exports the current data as a CSV file.">
-                            <button class='nisbutton export'>
+                            <button class='nisbutton nissmallbutton export'>
                                 CSV Export
                             </button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <button class="nisbutton" data-type="reset" data-toggle="collapse" href="#resetApp">
+                            <button class="nisbutton nissmallbutton" data-type="reset" data-toggle="collapse"
+                                href="#resetApp">
                                 Factory Reset
                             </button>
                         </div>
@@ -97,18 +98,18 @@
                             <div class="row">
                                 <div class="col text-center">
                                     This will remove all saved data and set all settings to default. This is
-                                    irreversable!
+                                    irreversible!
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <button class="nisbutton clear" data-type="reset" data-toggle="collapse"
-                                        href="#resetApp">
+                                    <button class="nisbutton nissmallbutton clear" data-type="reset"
+                                        data-toggle="collapse" href="#resetApp">
                                         Yes
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button class="nisbutton" data-toggle="collapse" href="#resetApp">
+                                    <button class="nisbutton nissmallbutton" data-toggle="collapse" href="#resetApp">
                                         No
                                     </button>
                                 </div>
@@ -120,6 +121,6 @@
         </div>
     </div>
 </body>
-<script src="scripts/script.js"></script>
+<script src="scripts/script.js" type="module"></script>
 
 </html>
