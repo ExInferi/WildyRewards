@@ -107,10 +107,10 @@ function readChatbox() {
     chat += opts[a].text.replace(ignoreLine, '').replace(',', '') + ' ';
   }
   // DEBUG: Uncomment to see chat and opts in console
-  if (chat.length || opts.length) {
-    console.log('Opts: ', opts);
-    console.debug('Chat:', chat);
-  }
+  // if (chat.length || opts.length) {
+  //   console.log('Opts: ', opts);
+  //   console.debug('Chat:', chat);
+  // }
   // Check if the chat message contains any of the following strings
   const found = [
     chat.indexOf('You open the ') > -1,
@@ -122,10 +122,9 @@ function readChatbox() {
       const regex = /(\[\d+:\d+:\d+\]) You open the (sack of wild rewards|sack of very wild rewards|wyrm reward gland) and receive: \s?((?:\1 \d+ x [\w\s()]+ ?)+)/g
       const itemRegex = /\[\d+:\d+:\d+\] (\d* x )([A-Za-z\s'\-!()\d]*)/g;
       const rewardRegex = new RegExp(regex.source);
-      // Remove commas for 1k+ rewards
       const rewards = chat.match(regex);
-      console.log(rewards)
       let counter = null;
+
       rewards.forEach((reward) => {
         const newReward = reward.match(rewardRegex);
         const source = newReward[2];
