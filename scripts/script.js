@@ -15,11 +15,16 @@ const DISPLAY_MODE = `${APP_PREFIX}Display`;
 // Themed app color
 const COL = [180, 195, 152];
 
-// Addional constants
+// Additional constants
 const appURL = window.location.href.replace('index.html', '');
 const appColor = A1lib.mixColor(COL[0], COL[1], COL[2]);
 const rgbColor = `rgb(${COL[0]}, ${COL[1]}, ${COL[2]})`;
 const showTotals = document.getElementById('show-totals');
+
+// Reward history optimization
+let currentList = 0;
+const itemsPerList = 25;
+
 
 // Set Chat reader
 let reader = new Chatbox.default();
@@ -249,7 +254,8 @@ function saveItem(regex, item, src) {
   console.log(getItem);
   saveData.push(getItem);
   util.setLocalStorage(DATA_STORAGE, saveData);
-  showItems();
+  // Trigger event to update the saveData and trigger showItems() -> see bottom part of the script
+  dispatchEvent(new StorageEvent('storage', { key: DATA_STORAGE }));
 }
 
 // Function to determine the total of all items recorded
@@ -264,33 +270,65 @@ function getTotal(source) {
   return total;
 }
 
+
 // Function to display totals on top of the list
 function displayTotal(text, total) {
   $('#item-list').append(`<li style="color:${rgbColor}">${text}: <strong>${total}</strong></li>`);
 }
+// Function to append items to the list below
+function appendItems(items) {
+  // Remove the load more button if it exists to prevent it floating in the middle of the list
+  if ($('#load-more').length !== 0) {
+    $('#load-more').remove();
+  }
 
+  items.forEach(item => {
+    $('#item-list').append(`<li title="From: ${item.source} @ ${util.formatDateTime(item.time)}">${item.item}</li>`);
+  });
+
+}
 // Function to create a list of all items and their totals
 function createList(total, type) {
   if (type === 'history') {
-    saveData.slice().reverse().map(item => {
-      $('#item-list').append(
-        `<li title="From: ${item.source} @ ${util.formatDateTime(item.time)}">${item.item}</li>`
-      )
-    })
+    const start = currentList * itemsPerList;
+    const end = start + itemsPerList;
+    const itemsToShow = [...saveData].reverse().slice(start, end);
+
+    if (end < saveData.length) {
+      appendItems(itemsToShow);
+
+      // Create the load more button (again)
+      $('#item-list').append('<button id="load-more" class="nisbutton nissmallbutton" type="button">Load More</button>');
+      $('#load-more').on('click', function () {
+        currentList++;
+        createList(total, type);
+      });
+    } else {
+      const remaining = saveData.length - start;
+      if (remaining > 0) {
+        const remainingItems = saveData.reverse().slice(start, start + remaining);
+        appendItems(remainingItems);
+      }
+    }
   } else {
-    Object.keys(total).sort().forEach(item => $('#item-list').append(
-      `<li>${item}: ${total[item].toLocaleString()}</li>`
-    ))
+    Object.keys(total).sort().forEach(item => {
+      $('#item-list').append(`<li>${item}: ${total[item].toLocaleString()}</li>`);
+    });
   }
 }
 
 function showItems() {
-  $('#item-list').empty();
-
   let display = util.getLocalStorage(DISPLAY_MODE) || 'history';
   let total = getTotal();
   let text = 'Total Opened';
-  let type = null
+  let type = null;
+
+  if (display !== 'history') {
+    $('#item-list').empty();
+    currentList = 0;
+  } else if (currentList === 0) {
+    $('#item-list').empty();
+  }
 
   // TODO: Change layout with tabs, so this code can be removed
   switch (display) {
@@ -299,7 +337,9 @@ function showItems() {
     }
       break;
     case 'history': {
-      $('#item-list').append(`<li data-show="wild-sack" title="Click to show Wild Sack Totals">Reward History</li>`);
+      if (currentList === 0) {
+        $('#item-list').append(`<li data-show="wild-sack" title="Click to show Wild Sack Totals">Reward History</li>`);
+      }
       type = 'history';
     }
       break;
@@ -323,6 +363,7 @@ function showItems() {
     }
       break;
   }
+
   if (showTotals.checked) {
     let totalRewards = wildSackOpened + veryWildSackOpened + wyrmGlandOpened;
     // CUSTOM: Additional totals for custom sources
@@ -513,9 +554,10 @@ window.addEventListener('storage', function (e) {
   }
 
   if (dataChanged) {
+    currentList = 0;
     showItems();
   }
-  console.debug('Data changed:', e.key);
+  console.debug('Local Storage changed:', `${e.key}, ${e.oldValue} -> ${e.newValue}`);
 });
 
 // Force read chatbox
