@@ -1,0 +1,173 @@
+.row {
+    text-align: center;
+}
+
+body {
+    margin-top: 10px !important;
+    cursor: url('./img/cursor.png'), default;
+}
+
+.nisbutton {
+    border: none;
+}
+
+.main {
+    overflow-y: scroll;
+    max-height: 75vh;
+    margin-top: 8px;
+}
+
+
+.modal-dialog {
+    margin: 0;
+}
+
+.modal-body,
+.modal-header,
+.modal-footer,
+.modal-content {
+    background-color: rgba(16, 25, 32, 0.667) !important;
+    color: white;
+}
+
+.warning {
+    background-color: yellow;
+    color: black;
+    font-weight: bold;
+}
+
+.danger {
+    background-color: red;
+    color: black;
+    font-weight: bold;
+}
+
+.list-group li {
+    background: transparent;
+    border: grey solid 1px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: .25rem;
+    text-align: left;
+    margin-bottom: -1px;
+}
+
+.total-radio {
+    justify-content: space-around;
+}
+
+label {
+    margin: 0;
+}
+
+h6 {
+    margin: 0.5rem auto 1em;
+}
+
+.list-group {
+    height: calc(100vh - 4.25em);
+    overflow-y: scroll;
+    padding-top: 20px;
+}
+
+.list-group::-webkit-scrollbar {
+    display: none;
+}
+
+#switch-display {
+    text-align: center;
+    background: url(https://runeapps.org/nis/alt1-currentskin/nisbutton.png) 0px -100%/24px 400% repeat content-box;
+    font-family: 'trajan-pro-3';
+    padding: unset;
+    position: fixed;
+    top: 10px;
+    width: 100%;
+    z-index: 1;
+    /* cursor: default; */
+    user-select: none;
+    margin: 0;
+    height: 20px;
+    line-height: 20px;
+    border: none;
+    font-size: 13px;
+}
+
+#switch-display::before,
+#switch-display::after {
+    content: none;
+}
+
+#switch-display:hover {
+    background-position: 0px -300%;
+}
+
+#switch-menu {
+    position: absolute;
+    top: 0;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    background: #000a;
+    padding-top: 40px;
+    z-index: 100;
+    padding-right: 10px;
+}
+
+.context-menu {
+    display: block;
+    text-align: center;
+    margin: 0 0 0 auto;
+    position: static;
+    list-style: none;
+    padding: 0;
+    background-image: url('https://runeapps.org/nis/alt1-currentskin/background.png');
+    border-radius: .5em;
+    width: fit-content;
+    /* cursor: default; */
+}
+
+.context-menu li {
+    margin: 0;
+    text-align: right;
+    padding: 0.5em 1.5em;
+    color: rgba(229, 230, 235, 0.8)
+}
+
+.context-menu li:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+}
+
+.context-menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--nis-col-std);
+}
+
+/* Replace all the alt1 css pointers */
+.nisexitbutton,
+.nissmallimagebutton,
+.nistinyimagebutton,
+.nisimgbutton,
+.contenttab,
+.contenttableft,
+.nisdropdown,
+.nisbutton,
+.pb2_nis .pb2-button,
+.nisbutton2,
+.nisclosebutton {
+    cursor: url('./img/pointer.png'), pointer;
+}
+
+/* bootstrap override */
+[type=button]:not(:disabled),
+[type=reset]:not(:disabled),
+[type=submit]:not(:disabled),
+button:not(:disabled) {
+    cursor: url('./img/pointer.png'), pointer;
+}
+
+input,
+select,
+label {
+    cursor: url('./img/cursor.png'), default;
+}

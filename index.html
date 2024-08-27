@@ -14,7 +14,7 @@
         crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="https://runeapps.org/nis/nis.css">
     <link rel="stylesheet" type="text/css" href="https://runeapps.org/runeappslib.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="./styles/style.css">
     <!-- <script type="text/javascript" src="https://runeapps.org/runeappslib.js"></script> -->
     <script src="https://www.unpkg.com/@alt1/base/dist/index.bundle.js"></script>
     <script src="https://www.unpkg.com/@alt1/ocr/dist/index.bundle.js"></script>
@@ -24,7 +24,15 @@
 <body class="nis">
 
     <ul class="list-group" id="item-list"></ul>
-
+    <div id="switch-menu" class="dropdown clearfix">
+        <ul class="context-menu nisborder" role="menu" aria-labelledby="switch-menu">
+            <li data-show="history" title="Show reward history">Reward History</li>
+            <li data-show="total" title="Show reward totals">Reward Totals</li>
+            <li data-show="wild-sack" title="Show wild sack totals">Wild Sack Totals</li>
+            <li data-show="very-wild-sack" title="Show very wild sack totals">Very Wild Sack Totals</li>
+            <li data-show="wyrm-gland" title="Show wyrm reward gland totals">Wyrm Gland Totals</li>
+        </ul>
+    </div>
     <div class="container">
         <div class="row fixed-bottom">
             <div class="col">
@@ -48,7 +56,7 @@
                 <div class="modal-header">
                     <h5 class="modal-title">Settings</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true"><img src="./assets/exit.png" alt="exit"></span>
+                        <span aria-hidden="true"><img src="./styles/img/exit.png" alt="exit"></span>
                     </button>
                 </div>
                 <div class="modal-body">
@@ -121,6 +129,6 @@
         </div>
     </div>
 </body>
-<script src="scripts/script.js" type="module"></script>
+<script src="./scripts/script.js" type="module"></script>
 
 </html>

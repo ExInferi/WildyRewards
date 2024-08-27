@@ -333,31 +333,31 @@ function showItems() {
   // TODO: Change layout with tabs, so this code can be removed
   switch (display) {
     case 'total': {
-      $('#item-list').append(`<li data-show="history" title="Click to show Reward History">Reward Item Totals</li>`);
+      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="wild-sack" title="Click to show all Wild Sack Totals">Reward Item Totals</li>`);
     }
       break;
     case 'history': {
       if (currentList === 0) {
-        $('#item-list').append(`<li data-show="wild-sack" title="Click to show Wild Sack Totals">Reward History</li>`);
+        $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="total" title="Click to show all Reward Totals">Reward History</li>`);
       }
       type = 'history';
     }
       break;
     // CUSTOM: Additional displays for custom sources
     case 'wild-sack': {
-      $('#item-list').append(`<li data-show="very-wild-sack" title="Click to show Very Wild Sack Totals">Wild Sack Reward Totals</li>`);
+      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="very-wild-sack" title="Click to show all Very Wild Sack Totals">Wild Sack Reward Totals</li>`);
       total = getTotal('sack of wild rewards');
       text = 'Wild Sacks Opened';
     }
       break;
     case 'very-wild-sack': {
-      $('#item-list').append(`<li data-show="wyrm-gland" title="Click to show all Wyrm Reward Gland Totals">Very Wild Sack Drop Totals</li>`);
+      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="wyrm-gland" title="Click to show all Wyrm Reward Gland Totals">Very Wild Sack Drop Totals</li>`);
       total = getTotal('sack of very wild rewards');
       text = 'Very Wild Sacks Opened';
     }
       break;
     case 'wyrm-gland': {
-      $('#item-list').append(`<li data-show="total" title="Click to show all Reward Totals">Wyrm Reward Gland Totals</li>`);
+      $('#item-list').append(`<li id="switch-display" class="nisbutton nissmallbutton" data-show="history" title="Click to show the Reward History">Wyrm Reward Gland Totals</li>`);
       total = getTotal('wyrm reward gland');
       text = 'Wyrm Glands Opened';
     }
@@ -484,12 +484,37 @@ $(function () {
   })
 
   // Toggle display mode
-  $(document).on('click', 'li:first-child', function () {
+  $(document).on('click', '#switch-display', function () {
     util.setLocalStorage(DISPLAY_MODE, `${$(this).data('show')}`);
     showItems()
   })
+
+  // Right-click to change display mode
+  const $displaySelect = $('#switch-menu');
+
+  $(document).on('contextmenu', '#switch-display', function (e) {
+    e.preventDefault();
+
+    $displaySelect.css({
+      display: 'block',
+    });
+  });
+
+  $('html').click(function () {
+    $displaySelect.hide();
+  });
+
+  $('#switch-menu li').click(function (e) {
+    util.setLocalStorage(DISPLAY_MODE, `${$(this).data('show')}`);
+    showItems()
+  });
 });
 
+
+$(function () {
+
+
+});
 // Toggle totals display
 $(function () {
   $('[data-totals]').each(function () {

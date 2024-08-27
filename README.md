@@ -24,7 +24,14 @@ Have fun tracking!
 
 ## Updates
 
-Soon™
+**Update 03 July 2024, 19:40 Game Time**:
+
+* Release!
+* The reward history only loads 25 items at a time to improve performance when a lot of rewards have been captured.
+  * *Click the "load more" button at the bottom of the list to expand.*
+* The top button can now be right clicked to quickly navigate rather than having to keep cycling with the left click.
+  ![context menu](/assets/contextmenu.png)
+  *Left click still works for cycling, though.*
 
 ## Special thanks
 
