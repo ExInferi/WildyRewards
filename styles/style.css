@@ -109,7 +109,7 @@ h6 {
     height: 100vh;
     background: #000a;
     padding-top: 40px;
-    z-index: 100;
+    z-index: 1000;
     padding-right: 10px;
 }
 
