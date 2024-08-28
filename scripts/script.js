@@ -156,7 +156,7 @@ function readChatbox() {
 
 // Save single item
 function saveSingleItem(match, regex, source, counter) {
-  if (counter && !saveChatHistory.includes(match)) {
+  if (counter && !saveChatHistory.includes(match.trim())) {
     increaseCounter(counter);
   }
 
@@ -166,7 +166,7 @@ function saveSingleItem(match, regex, source, counter) {
 // In case of possible multiple items, save them all
 function saveMultipleItems(match, regex, source, counter) {
   const filtered = filterItems(match, regex);
-  const alreadySaved = filtered.some(item => saveChatHistory.includes(item));
+  const alreadySaved = filtered.some(item => saveChatHistory.includes(item.trim()));
 
   if (counter && !alreadySaved) {
     increaseCounter(counter);
@@ -212,8 +212,8 @@ function filterItems(items, regex) {
   });
   // Update the saveChatHistory with the original item that was modified
   items.forEach(item => {
-    if (!updatedItemsArray.includes(item) && !saveChatHistory.includes(item)) {
-      saveChatHistory.push(item);
+    if (!updatedItemsArray.includes(item) && !saveChatHistory.includes(item.trim())) {
+      saveChatHistory.push(item.trim());
     }
   });
   return updatedItemsArray;
@@ -231,11 +231,11 @@ function increaseCounter(counter) {
 function saveItem(regex, item, src) {
   // Adjust regex to remove any flags
   const cleanRegex = new RegExp(regex.source);
-  if (saveChatHistory.includes(item)) {
-    console.debug('Duplicate:', item);
+  if (saveChatHistory.includes(item.trim())) {
+    console.debug('Duplicate:', item.trim());
     return;
   }
-  saveChatHistory.push(item);
+  saveChatHistory.push(item.trim());
   util.setSessionStorage(CHAT_SESSION, saveChatHistory);
 
   const reward = item.match(cleanRegex);

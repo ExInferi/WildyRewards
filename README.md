@@ -24,7 +24,11 @@ Have fun tracking!
 
 ## Updates
 
-**Update 03 July 2024, 19:40 Game Time**:
+**Update 28 Aug 2024, 13:10 Game Time**:
+
+* Released a potential fix for duplicate items being logged after coins were added to pouch.
+
+**Update 27 Aug 2024, 19:40 Game Time**:
 
 * Release!
 * The reward history only loads 25 items at a time to improve performance when a lot of rewards have been captured.
