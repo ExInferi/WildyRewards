@@ -225,7 +225,12 @@ function increaseCounter(counter) {
   num += 1;
   localStorage.setItem(counter, num);
   // Trigger event to update the counter variable -> see bottom part of the script
-  dispatchEvent(new StorageEvent('storage', { key: counter }));
+  const options = {
+    key: counter,
+    oldValue: JSON.stringify(num - 1),
+    newValue: JSON.stringify(num)
+  }
+  dispatchEvent(new StorageEvent('storage', options));
 }
 
 function saveItem(regex, item, src) {
@@ -255,7 +260,12 @@ function saveItem(regex, item, src) {
   saveData.push(getItem);
   util.setLocalStorage(DATA_STORAGE, saveData);
   // Trigger event to update the saveData and trigger showItems() -> see bottom part of the script
-  dispatchEvent(new StorageEvent('storage', { key: DATA_STORAGE }));
+  const options = {
+    key: DATA_STORAGE,
+    oldValue: JSON.stringify(saveData.slice(-1)),
+    newValue: JSON.stringify(saveData)
+  }
+  dispatchEvent(new StorageEvent('storage', options));
 }
 
 // Function to determine the total of all items recorded
@@ -579,10 +589,21 @@ window.addEventListener('storage', function (e) {
   }
 
   if (dataChanged) {
+    const types = typeof (JSON.parse(e.oldValue)) === typeof (JSON.parse(e.newValue)) ? typeof (JSON.parse(e.newValue)) : 'mismatch';
+    switch (types) {
+      case 'mismatch':
+        throw new Error('Data type mismatch');
+      case 'object':
+        const oldV = e.oldValue !== 'null' ? Object.values(JSON.parse(e.oldValue)).slice(-1)[0] : null;
+        const newV = Object.values(JSON.parse(e.newValue)).slice(-1)[0];
+        console.debug('Local Storage changed:', `${e.key}`, '\nLast item: ', oldV, '->', newV);
+        break;
+      default:
+        console.debug('Local Storage changed:', `${e.key}, ${e.oldValue} -> ${e.newValue}`);
+    }
     currentList = 0;
     showItems();
   }
-  console.debug('Local Storage changed:', `${e.key}, ${e.oldValue} -> ${e.newValue}`);
 });
 
 // Force read chatbox
