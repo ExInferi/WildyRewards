@@ -25,7 +25,7 @@ const showTotals = document.getElementById('show-totals');
 let currentList = 0;
 const itemsPerList = 25;
 
-
+let debugChat = false;
 // Set Chat reader
 let reader = new Chatbox.default();
 reader.readargs = {
@@ -34,7 +34,7 @@ reader.readargs = {
     A1lib.mixColor(102, 152, 255), // Common wildy reward color (blue)
     A1lib.mixColor(163, 53, 238), // Uncommon wildy reward color (purple)
     A1lib.mixColor(255, 128, 0), // Rare wildy reward color (orange)
-    // A1lib.mixColor(127,169,255), // Test Chat text color
+    // A1lib.mixColor(127, 169, 255), // Test Chat text color
   ],
   backwards: true,
 };
@@ -58,11 +58,17 @@ if (!window.alt1) {
   $('#item-list').html('<p style="text-indent:1em">Searching for chatboxes...</p>');
 }
 window.addEventListener('load', function () {
-  reader.find();
-  reader.read();
+  if (window.alt1) {
+    reader.find();
+    reader.read();
+  }
 })
 
 let findChat = setInterval(function () {
+  if (!window.alt1) {
+    clearInterval(findChat);
+    return;
+  }
   if (reader.pos === null)
     reader.find();
   else {
@@ -106,16 +112,18 @@ function showSelectedChat(chat) {
 function readChatbox() {
   let opts = reader.read() || [];
   let chat = '';
-  // Additional options to ignore adding to coin pouch and removing commas
+  // CUSTOM: Additional options to ignore adding to coin pouch and removing commas
   const ignoreLine = /\[\d+:\d+:\d+\] \d*,?\d* coins have been added to your money pouch.\s?/g;
   for (let a in opts) {
     chat += opts[a].text.replace(ignoreLine, '').replace(',', '') + ' ';
   }
-  // DEBUG: Uncomment to see chat and opts in console
-  // if (chat.length || opts.length) {
-  //   console.log('Opts: ', opts);
-  //   console.debug('Chat:', chat);
-  // }
+  // DEBUG: See chat and opts in console
+  if (debugChat) {
+    if (chat.trim().length > 0) {
+      console.log('Chat:', chat);
+      console.table(opts);
+    }
+  }
   // Check if the chat message contains any of the following strings
   const found = [
     chat.indexOf('You open the ') > -1,
@@ -608,3 +616,9 @@ window.addEventListener('storage', function (e) {
 
 // Force read chatbox
 A1lib.on('alt1pressed', readChatbox);
+
+// DEBUG: Show chat history
+window.toggleChat = () => {
+  debugChat = !debugChat;
+  console.log('Debug chat:', debugChat);
+}
