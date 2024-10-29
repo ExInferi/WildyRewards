@@ -53,7 +53,7 @@ let wyrmGlandOpened = parseInt(util.getLocalStorage(`${APP_PREFIX}WyrmGlandOpene
 
 // Find all visible chatboxes on screen
 if (!window.alt1) {
-  $('#item-list').html(`<p style="text-indent:1em">Alt1 not detected. <a href='alt1:// Addapp/${appURL}appconfig.json'>Click here to add the app to Alt1</a></p>`);
+  $('#item-list').html(`<p style="text-indent:1em">Alt1 not detected. <a href='alt1://addapp/${appURL}appconfig.json'>Click here to add the app to Alt1</a></p>`);
 } else {
   $('#item-list').html('<p style="text-indent:1em">Searching for chatboxes...</p>');
 }
