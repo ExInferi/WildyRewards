@@ -136,6 +136,10 @@ function readChatbox() {
       const itemRegex = /\[\d+:\d+:\d+\] (\d* x )([A-Za-z\s'\-!()\d]*)/g;
       const rewardRegex = new RegExp(regex.source);
       const rewards = chat.match(regex);
+      if (!rewards) {
+        console.info('No rewards found in chat:', chat);
+        return;
+      }
       let counter = null;
 
       rewards.forEach((reward) => {
