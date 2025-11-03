@@ -43,7 +43,7 @@ reader.readargs = {
 };
 
 // Setup main storage variables
-await util.migrateLocalToIDB(DATA_STORAGE)
+await util.migrateLocalToIDB(DATA_STORAGE);
 let saveData = await util.getIDB(DATA_STORAGE) || [];
 util.createSessionStorage(CHAT_SESSION);
 let saveChatHistory = util.getSessionStorage(CHAT_SESSION) || [];
@@ -245,7 +245,7 @@ function increaseCounter(counter) {
     oldValue: JSON.stringify(num - 1),
     newValue: JSON.stringify(num)
   }
-  bc.postMessage(msg);
+  util.broadcast(bc, msg);
 }
 
 async function saveItem(regex, item, src) {
@@ -280,7 +280,7 @@ async function saveItem(regex, item, src) {
     newValue: JSON.stringify(saveData.slice(-1))
   }
   await util.setIDB(DATA_STORAGE, saveData);
-  bc.postMessage(msg);
+  util.broadcast(bc, msg);
 }
 
 // Function to determine the total of all items recorded

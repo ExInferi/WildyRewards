@@ -37,6 +37,14 @@ async function migrateLocalToIDB(key) {
     return false;
 }
 
+// BC sync utility function
+
+function broadcast(channel, msg) {
+  const msgEvent = new MessageEvent('message', { data: msg });
+  channel.dispatchEvent(msgEvent);
+  channel.postMessage(msg);
+}
+
 // localStorage utility functions
 
 function createLocalStorage(...keys) {
@@ -142,6 +150,7 @@ export {
     deleteIDB,
     clearIDB,
     migrateLocalToIDB,
+    broadcast,
     createLocalStorage,
     getLocalStorage,
     setLocalStorage,
