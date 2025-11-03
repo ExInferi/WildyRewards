@@ -40,8 +40,9 @@ reader.readargs = {
 };
 
 // Setup main storage variables
-util.createLocalStorage(DATA_STORAGE);
-let saveData = util.getLocalStorage(DATA_STORAGE) || [];
+// util.createLocalStorage(DATA_STORAGE);
+await util.migrateLocalToIDB(DATA_STORAGE)
+let saveData = await util.getIDB(DATA_STORAGE) || [];
 util.createSessionStorage(CHAT_SESSION);
 let saveChatHistory = util.getSessionStorage(CHAT_SESSION) || [];
 if (!util.getLocalStorage(DISPLAY_MODE)) util.setLocalStorage(DISPLAY_MODE, 'history');
@@ -245,7 +246,7 @@ function increaseCounter(counter) {
   dispatchEvent(new StorageEvent('storage', options));
 }
 
-function saveItem(regex, item, src) {
+async function saveItem(regex, item, src) {
   // Adjust regex to remove any flags
   const cleanRegex = new RegExp(regex.source);
   if (saveChatHistory.includes(item.trim())) {
@@ -270,7 +271,7 @@ function saveItem(regex, item, src) {
   };
   console.log(getItem);
   saveData.push(getItem);
-  util.setLocalStorage(DATA_STORAGE, saveData);
+  await util.setIDB(DATA_STORAGE, saveData);
   // Trigger event to update the saveData and trigger showItems() -> see bottom part of the script
   const options = {
     key: DATA_STORAGE,
@@ -496,7 +497,8 @@ $(function () {
 
   // Factory reset
   $('.clear').click(function () {
-    util.deleteLocalStorage(DATA_STORAGE, SELECTED_CHAT, DISPLAY_MODE, `${TOTALS_PREFIX}hide`, `${TOTALS_PREFIX}show`);
+    util.deleteLocalStorage(SELECTED_CHAT, DISPLAY_MODE, `${TOTALS_PREFIX}hide`, `${TOTALS_PREFIX}show`);
+    util.deleteIDB(DATA_STORAGE);
     util.deleteSessionStorage(CHAT_SESSION);
     // CUSTOM: Additional storage keys to clear
     util.deleteLocalStorage(`${APP_PREFIX}WildSackOpened`, `${APP_PREFIX}VeryWildSackOpened`, `${APP_PREFIX}WyrmGlandOpened`);
@@ -560,11 +562,11 @@ $(window).bind('unload', function () {
 });
 
 // Event listener to check if data has been altered
-window.addEventListener('storage', function (e) {
+window.addEventListener('storage', async function (e) {
   let dataChanged = false;
   switch (e.key) {
     case DATA_STORAGE: {
-      let changedData = util.getLocalStorage(DATA_STORAGE);
+      let changedData = await util.getIDB(DATA_STORAGE);
       let lastChange = changedData[changedData.length - 1];
       let lastSave = [saveData[saveData.length - 1]]
       if (lastChange != lastSave) {

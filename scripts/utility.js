@@ -1,3 +1,42 @@
+// idb-keyval IndexedDB utility functions
+
+import * as idb from './idb-keyval.js';
+
+async function getIDB(key) {
+    return await idb.get(key) || [];
+}
+
+async function setIDB(key, value) {
+    return await idb.set(key, value);
+}
+
+async function deleteIDB(...keys) {
+    for (const key of keys) {
+        await idb.del(key);
+    }
+}
+
+async function clearIDB() {
+    await idb.clear();
+}
+
+async function migrateLocalToIDB(key) {
+    const localData = localStorage.getItem(key);
+    if (localData && localData !== 'null') {
+        console.log(`Found key "${key}" in localStorage, migrating to IndexedDB...`);
+        // Parse and store in IDB
+        const parsed = JSON.parse(localData);
+        console.log('Parsed data:', parsed);
+        await setIDB(key, parsed);
+        console.log(`Set key "${key}" in IndexedDB`);
+        // Remove from localStorage after migration
+        localStorage.removeItem(key);
+        console.log(`Removed key "${key}" from localStorage after migration.`);
+        return true;
+    }
+    return false;
+}
+
 // localStorage utility functions
 
 function createLocalStorage(...keys) {
@@ -98,6 +137,11 @@ function downloadFile(blob, filename) {
 }
 
 export {
+    getIDB,
+    setIDB,
+    deleteIDB,
+    clearIDB,
+    migrateLocalToIDB,
     createLocalStorage,
     getLocalStorage,
     setLocalStorage,
