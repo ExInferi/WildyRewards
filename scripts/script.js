@@ -12,6 +12,9 @@ const CHAT_SESSION = `${APP_PREFIX}ChatHistory`;
 const TOTALS_PREFIX = `${APP_PREFIX}Totals_`;
 const DISPLAY_MODE = `${APP_PREFIX}Display`;
 
+// Set up Broadcasting Channel for cross-tab communication
+const bc = new BroadcastChannel(APP_PREFIX);
+
 // Themed app color
 const COL = [180, 195, 152];
 
@@ -40,7 +43,6 @@ reader.readargs = {
 };
 
 // Setup main storage variables
-// util.createLocalStorage(DATA_STORAGE);
 await util.migrateLocalToIDB(DATA_STORAGE)
 let saveData = await util.getIDB(DATA_STORAGE) || [];
 util.createSessionStorage(CHAT_SESSION);
@@ -238,12 +240,12 @@ function increaseCounter(counter) {
   num += 1;
   localStorage.setItem(counter, num);
   // Trigger event to update the counter variable -> see bottom part of the script
-  const options = {
+  const msg = {
     key: counter,
     oldValue: JSON.stringify(num - 1),
     newValue: JSON.stringify(num)
   }
-  dispatchEvent(new StorageEvent('storage', options));
+  bc.postMessage(msg);
 }
 
 async function saveItem(regex, item, src) {
@@ -271,14 +273,14 @@ async function saveItem(regex, item, src) {
   };
   console.log(getItem);
   saveData.push(getItem);
-  await util.setIDB(DATA_STORAGE, saveData);
   // Trigger event to update the saveData and trigger showItems() -> see bottom part of the script
-  const options = {
+  const msg = {
     key: DATA_STORAGE,
-    oldValue: JSON.stringify(saveData.slice(-1)),
-    newValue: JSON.stringify(saveData)
+    oldValue: JSON.stringify(saveData.slice(-2, -1)),
+    newValue: JSON.stringify(saveData.slice(-1))
   }
-  dispatchEvent(new StorageEvent('storage', options));
+  await util.setIDB(DATA_STORAGE, saveData);
+  bc.postMessage(msg);
 }
 
 // Function to determine the total of all items recorded
@@ -562,9 +564,10 @@ $(window).bind('unload', function () {
 });
 
 // Event listener to check if data has been altered
-window.addEventListener('storage', async function (e) {
+bc.addEventListener('message', async function (e) {
+  let data = e.data;
   let dataChanged = false;
-  switch (e.key) {
+  switch (data.key) {
     case DATA_STORAGE: {
       let changedData = await util.getIDB(DATA_STORAGE);
       let lastChange = changedData[changedData.length - 1];
@@ -603,17 +606,17 @@ window.addEventListener('storage', async function (e) {
   }
 
   if (dataChanged) {
-    const types = typeof (JSON.parse(e.oldValue)) === typeof (JSON.parse(e.newValue)) ? typeof (JSON.parse(e.newValue)) : 'mismatch';
+    const types = typeof (JSON.parse(data.oldValue)) === typeof (JSON.parse(data.newValue)) ? typeof (JSON.parse(data.newValue)) : 'mismatch';
     switch (types) {
       case 'mismatch':
         throw new Error('Data type mismatch');
       case 'object':
-        const oldV = e.oldValue !== 'null' ? Object.values(JSON.parse(e.oldValue)).slice(-1)[0] : null;
-        const newV = Object.values(JSON.parse(e.newValue)).slice(-1)[0];
-        console.debug('Local Storage changed:', `${e.key}`, '\nLast item: ', oldV, '->', newV);
+        const oldV = data.oldValue !== 'null' ? Object.values(JSON.parse(data.oldValue)).slice(-1)[0] : null;
+        const newV = Object.values(JSON.parse(data.newValue)).slice(-1)[0];
+        console.debug('Local Storage changed:', `${data.key}`, '\nLast item: ', oldV, '->', newV);
         break;
       default:
-        console.debug('Local Storage changed:', `${e.key}, ${e.oldValue} -> ${e.newValue}`);
+        console.debug('Local Storage changed:', `${data.key}, ${data.oldValue} -> ${data.newValue}`);
     }
     currentList = 0;
     showItems();
